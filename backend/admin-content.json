@@ -1,0 +1,301 @@
+{
+  "personal": {
+    "name": "Dip Biswas",
+    "title": "Exploring technology, design, and innovation through thoughtful work and experimentation",
+    "location": "Rajbari, Dhaka",
+    "email": "bdip470@gmail.com",
+    "about": "Graduate with practical experience in web development, UI/UX design, and graphic design. I enjoy learning new technologies, solving\nproblems, and creating simple, user-friendly digital solutions. I’m a fast learner who can easily adapt to new environments and situations, work\nwell with others, and take on new challenges. I’m looking for an opportunity to apply my skills, gain real-world experience, and grow\nprofessionally."
+  },
+  "achievements": [
+    {
+      "id": 1,
+      "title": "Got The IEEE Start Award",
+      "year": 2023
+    },
+    {
+      "id": 2,
+      "title": "1st Position - Web Design Competition by Hack TechSociety",
+      "year": 2023
+    },
+    {
+      "id": 3,
+      "title": "1st Position - Photography Competition by Photonics Society",
+      "year": 2023
+    },
+    {
+      "id": "1791014920608",
+      "title": "Wireless Communications for Everybody.pdf",
+      "year": 2026,
+      "type": "Certificate",
+      "image": "/api/uploads/achievements/Coursera%20Wireless%20Communications%20for%20Everybody.pdf"
+    },
+    {
+      "id": "1791014949839",
+      "title": "Machine Learning Introduction for Everyone.pdf",
+      "year": 2026,
+      "type": "Certificate",
+      "image": "/api/uploads/achievements/Coursera%20Machine%20Learning%20Introduction%20for%20Everyone.pdf"
+    },
+    {
+      "id": "1791014959827",
+      "title": "Theory of Angular Momentum.pdf",
+      "year": 2026,
+      "type": "Certificate",
+      "image": "/api/uploads/achievements/Coursera%20Theory%20of%20Angular%20Momentum.pdf"
+    },
+    {
+      "id": "1791014969671",
+      "title": "React Native.pdf",
+      "year": 2026,
+      "type": "Certificate",
+      "image": "/api/uploads/achievements/Coursera%20React%20Native.pdf"
+    },
+    {
+      "id": "1791015014077",
+      "title": "5G Mobile Networks.pdf",
+      "year": 2026,
+      "type": "Certificate",
+      "image": "/api/uploads/achievements/Coursera%20%205G%20Mobile%20Networks.pdf"
+    },
+    {
+      "id": "1791015023150",
+      "title": "4G Network Fundamentals.pdf",
+      "year": 2026,
+      "type": "Certificate",
+      "image": "/api/uploads/achievements/Coursera%204G%20Network%20Fundamentals.pdf"
+    },
+    {
+      "id": "1791015031618",
+      "title": "Supply Chain Excellence.pdf",
+      "year": 2026,
+      "type": "Certificate",
+      "image": "/api/uploads/achievements/Coursera_Supply%20Chain%20Excellence.pdf"
+    },
+    {
+      "id": "1791015040446",
+      "title": "Mastering Logistics & Supply Chain Management.pdf",
+      "year": 2026,
+      "type": "Certificate",
+      "image": "/api/uploads/achievements/Coursera_Mastering%20Logistics%20%26%20Supply%20Chain%20Management.pdf"
+    },
+    {
+      "id": "1791015561745",
+      "title": "Industrial IoT Markets and Security.pdf",
+      "year": 2026,
+      "type": "Certificate",
+      "image": "/api/uploads/achievements/Coursera%20Industrial%20IoT%20Markets%20and%20Security.pdf"
+    }
+  ],
+  "gallery": [
+    {
+      "id": 1,
+      "title": "Diwali Extravaganza.",
+      "category": "Photography",
+      "image": "/gallery/IMG_0538.JPG",
+      "description": ""
+    },
+    {
+      "id": 2,
+      "title": "IEEE Delhi Section",
+      "category": "Portrait",
+      "image": "/gallery/IMG_3364.JPG",
+      "description": ""
+    },
+    {
+      "id": 3,
+      "title": "Manthan",
+      "category": "Lifestyle",
+      "image": "/gallery/IMG_5574.JPG",
+      "description": ""
+    },
+    {
+      "id": 4,
+      "title": "Manthan 2.0",
+      "category": "Event",
+      "image": "/gallery/IMG_5881.JPG",
+      "description": ""
+    },
+    {
+      "id": 5,
+      "title": "Code Of Genius",
+      "category": "Street",
+      "image": "/gallery/1726854847155.JPG",
+      "description": ""
+    },
+    {
+      "id": "1791016712385",
+      "title": "GOC",
+      "category": "Gallery",
+      "image": "/api/uploads/gallery/G.JPG",
+      "description": ""
+    },
+    {
+      "id": "1791016862169",
+      "title": "Love Babbar",
+      "category": "Gallery",
+      "image": "/api/uploads/gallery/IMG_7572.JPG",
+      "description": ""
+    },
+    {
+      "id": "1791017641306",
+      "title": "Got Award",
+      "category": "Gallery",
+      "image": "/api/uploads/gallery/IMG_0267.JPG",
+      "description": ""
+    },
+    {
+      "id": "graduate",
+      "title": "IMG_5905.PNG",
+      "category": "Gallery",
+      "image": "/api/uploads/gallery/IMG_5905.PNG",
+      "description": ""
+    }
+  ],
+  "resume": "/DIpBiswas_Resume.pdf",
+  "education": [
+    {
+      "id": 1,
+      "degree": "Bachelor of Engineering in Information Technology",
+      "institution": "Chandigarh University",
+      "period": "Completed in 2022",
+      "details": ""
+    },
+    {
+      "id": 2,
+      "degree": "Class 12",
+      "institution": "Kumarkhatri Govt. College, Kushia",
+      "period": "Completed in 2022"
+    }
+  ],
+  "experience": [
+    {
+      "id": 1,
+      "company": "IEEE Computer Society",
+      "position": "Graphic Designer & Webmaster",
+      "period": "Jan 2023 - Dec 2024",
+      "description": [
+        "Designed promotional materials and managed the chapter website."
+      ]
+    },
+    {
+      "id": 2,
+      "company": "UncleFAB",
+      "position": "Web Developer",
+      "period": "2023 - 2025",
+      "description": [
+        "Maintained responsive web pages and promotional content."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "dipbiswas_Portfolio",
+      "title": "Dipbiswas Portfolio",
+      "company": "dip0biswas / main",
+      "description": "A portfolio project",
+      "tags": [
+        "Development"
+      ],
+      "image": "https://opengraph.githubassets.com/1/dip0biswas/dipbiswas_Portfolio",
+      "year": "2026",
+      "goal": "Explore the dipbiswas_Portfolio repository.",
+      "results": "GitHub repository: https://github.com/dip0biswas/dipbiswas_Portfolio",
+      "overview": "Updated 03/10/2026.",
+      "detailImages": [
+        "https://opengraph.githubassets.com/1/dip0biswas/dipbiswas_Portfolio"
+      ],
+      "link": "https://github.com/dip0biswas/dipbiswas_Portfolio",
+      "github_url": "https://github.com/dip0biswas/dipbiswas_Portfolio",
+      "readme_url": "https://github.com/dip0biswas/dipbiswas_Portfolio#readme",
+      "stars": 0,
+      "forks": 0,
+      "language": "",
+      "updated_at": "2026-10-03T07:00:23Z"
+    },
+    {
+      "id": "Snake_Game",
+      "title": "Snake Game",
+      "company": "dip0biswas / main",
+      "description": "A portfolio project",
+      "tags": [
+        "Java"
+      ],
+      "image": "https://opengraph.githubassets.com/1/dip0biswas/Snake_Game",
+      "year": "2026",
+      "goal": "Explore the Snake_Game repository.",
+      "results": "GitHub repository: https://github.com/dip0biswas/Snake_Game",
+      "overview": "Updated 03/10/2026.",
+      "detailImages": [
+        "https://opengraph.githubassets.com/1/dip0biswas/Snake_Game"
+      ],
+      "link": "https://github.com/dip0biswas/Snake_Game",
+      "github_url": "https://github.com/dip0biswas/Snake_Game",
+      "readme_url": "https://github.com/dip0biswas/Snake_Game#readme",
+      "stars": 0,
+      "forks": 0,
+      "language": "Java",
+      "updated_at": "2026-10-03T06:11:47Z"
+    }
+  ],
+  "toolbox": [
+    {
+      "id": 1,
+      "name": "Figma",
+      "image": "/Figma.png"
+    },
+    {
+      "id": 2,
+      "name": "VS Code",
+      "image": "/VSCode.png"
+    },
+    {
+      "id": 3,
+      "name": "ChatGPT",
+      "image": "/Chatgpt.png"
+    },
+    {
+      "id": 4,
+      "name": "Photoshop",
+      "image": "/Photoshop.png"
+    },
+    {
+      "id": 5,
+      "name": "Canva",
+      "image": "/Canva.png"
+    },
+    {
+      "id": 6,
+      "name": "IntelliJ",
+      "image": "/IntelliJ_IDEA.png"
+    },
+    {
+      "id": 7,
+      "name": "MongoDB",
+      "image": "/MongoDB.png"
+    }
+  ],
+  "testimonials": [
+    {
+      "id": 1,
+      "name": "Avisekh Golder",
+      "role": "Asst. Engineer",
+      "testimonial": "Dip has an incredible attention to detail and consistently turns simple ideas into thoughtful, polished work.",
+      "avatar": "👤"
+    },
+    {
+      "id": 2,
+      "name": "Nitish Kumar",
+      "role": "Founder And Mentor",
+      "testimonial": "Working with Dip has been an absolute pleasure. His understanding of user needs is outstanding.",
+      "avatar": "👩"
+    },
+    {
+      "id": 3,
+      "name": "Jatin gautam",
+      "role": "UI/UX Designer",
+      "testimonial": "Working with Dip has been an absolute pleasure. His understanding of user needs is outstanding.",
+      "avatar": "👩"
+    }
+  ],
+  "skills": []
+}
