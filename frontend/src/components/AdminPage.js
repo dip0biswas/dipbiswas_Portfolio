@@ -157,6 +157,8 @@ function AdminPage() {
 
   React.useEffect(() => {
     if (token) loadAdmin();
+    // loadAdmin is recreated every render; only reload when the token changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const save = async () => {
