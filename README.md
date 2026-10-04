@@ -108,6 +108,15 @@ To customize the content, edit the `portfolioData` object in [backend/server.js]
 ### Frontend
 Deploy on Vercel, Netlify, or any static hosting service.
 
+For this repository layout, both providers are configured automatically:
+
+- Netlify uses `netlify.toml` and builds from `frontend/`.
+- Vercel uses `vercel.json` and builds from `frontend/`.
+
+The frontend can use the bundled fallback portfolio data without a backend. To
+connect it to a deployed backend API, set `REACT_APP_API_URL` in the hosting
+provider's environment variables before building.
+
 ### Backend
 Deploy on Heroku, Railway, or any Node.js hosting service.
 

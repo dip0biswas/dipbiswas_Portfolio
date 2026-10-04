@@ -8,8 +8,6 @@ require('dotenv').config();
 // GitHub API configuration
 const GITHUB_USERNAME = process.env.GITHUB_USERNAME || 'dip0biswas';
 const GITHUB_API_BASE = 'https://api.github.com';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'change-me-now';
-const adminTokens = new Set();
 
 const app = express();
 
@@ -96,23 +94,13 @@ const achievementDirectory = path.join(publicDirectory, 'achievements');
 const testimonialDirectory = path.join(publicDirectory, 'testimonials');
 const projectDirectory = path.join(publicDirectory, 'projects');
 
-const readAdminContent = () => {
+const readPortfolioOverrides = () => {
   try {
     if (fs.existsSync(contentFilePath)) return JSON.parse(fs.readFileSync(contentFilePath, 'utf8'));
   } catch (error) {
-    console.error('Error reading admin content:', error.message);
+    console.error('Error reading portfolio overrides:', error.message);
   }
   return { personal: {}, achievements: null, gallery: null, resume: '/resume.pdf' };
-};
-
-const saveAdminContent = (content) => {
-  fs.writeFileSync(contentFilePath, JSON.stringify(content, null, 2));
-};
-
-const requireAdmin = (req, res, next) => {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-  if (!token || !adminTokens.has(token)) return res.status(401).json({ success: false, error: 'Admin login required' });
-  next();
 };
 
 // Uploaded assets must be served outside the compiled build directory too.
@@ -593,123 +581,13 @@ app.get('/api/health', (req, res) => {
 
 // Routes
 app.get('/api/portfolio', (req, res) => {
-  const editable = readAdminContent();
+  const editable = readPortfolioOverrides();
   res.json({
     ...portfolioData,
     ...editable,
     personal: { ...portfolioData.personal, ...editable.personal },
     achievements: editable.achievements || portfolioData.achievements
   });
-});
-
-app.get('/api/admin/content', requireAdmin, (req, res) => {
-  res.json({ success: true, data: readAdminContent() });
-});
-
-app.post('/api/admin/login', (req, res) => {
-  if (!req.body?.password || req.body.password !== ADMIN_PASSWORD) {
-    return res.status(401).json({ success: false, error: 'Invalid admin password' });
-  }
-  const token = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  adminTokens.add(token);
-  res.json({ success: true, token });
-});
-
-app.put('/api/admin/content', requireAdmin, (req, res) => {
-  const current = readAdminContent();
-  const next = {
-    ...current,
-    ...req.body,
-    personal: { ...current.personal, ...(req.body.personal || {}) }
-  };
-  saveAdminContent(next);
-  res.json({ success: true, data: next });
-});
-
-app.post('/api/admin/upload', requireAdmin, (req, res) => {
-  const { type, name, data, title, year, achievementType, personId, projectId } = req.body || {};
-  if (!data || !['gallery', 'achievement', 'resume', 'testimonial', 'project'].includes(type)) {
-    return res.status(400).json({ success: false, error: 'Upload type and file data are required' });
-  }
-  const match = data.match(/^data:([^;]+);base64,(.+)$/);
-  if (!match) return res.status(400).json({ success: false, error: 'Invalid file data' });
-  const directory = type === 'gallery'
-    ? galleryDirectory
-    : type === 'achievement' ? achievementDirectory
-      : type === 'testimonial' ? testimonialDirectory : publicDirectory;
-  const uploadDirectory = type === 'project' ? projectDirectory : directory;
-  fs.mkdirSync(uploadDirectory, { recursive: true });
-  const safeName = path.basename(name || (type === 'resume' ? 'resume.pdf' : `${type}-${Date.now()}.jpg`));
-  const target = path.join(uploadDirectory, safeName);
-  fs.writeFileSync(target, Buffer.from(match[2], 'base64'));
-  const url = type === 'gallery'
-    ? `/api/uploads/gallery/${encodeURIComponent(safeName)}`
-    : type === 'achievement' ? `/api/uploads/achievements/${encodeURIComponent(safeName)}`
-      : type === 'testimonial' ? `/api/uploads/testimonials/${encodeURIComponent(safeName)}`
-        : type === 'project' ? `/api/uploads/projects/${encodeURIComponent(safeName)}`
-          : `/api/uploads/resume/${encodeURIComponent(safeName)}`;
-  const content = readAdminContent();
-  if (type === 'gallery') {
-    content.gallery = [...(content.gallery || []), { id: Date.now().toString(), title: safeName, category: 'Gallery', image: url, description: '' }];
-  } else if (type === 'achievement') {
-    content.achievements = [
-      ...(content.achievements || portfolioData.achievements),
-      {
-        id: Date.now().toString(),
-        title: title || safeName,
-        year: year || new Date().getFullYear(),
-        type: achievementType || 'Achievement',
-        image: url
-      }
-    ];
-  } else if (type === 'testimonial') {
-    const testimonials = content.testimonials || portfolioData.testimonials;
-    const person = testimonials.find((item) => String(item.id) === String(personId));
-    if (!person) return res.status(404).json({ success: false, error: 'Person not found' });
-    content.testimonials = testimonials.map((item) => (
-      String(item.id) === String(personId) ? { ...item, avatar: url } : item
-    ));
-  } else if (type === 'project') {
-    const projects = content.projects || [];
-    const project = projects.find((item) => String(item.id) === String(projectId));
-    if (!project) return res.status(404).json({ success: false, error: 'Project not found' });
-    content.projects = projects.map((item) => (
-      String(item.id) === String(projectId) ? { ...item, image: url } : item
-    ));
-  } else {
-    content.resume = url;
-  }
-  saveAdminContent(content);
-  res.json({ success: true, data: content });
-});
-
-app.delete('/api/admin/achievements/:id', requireAdmin, (req, res) => {
-  const content = readAdminContent();
-  const achievements = content.achievements || portfolioData.achievements;
-  const item = achievements.find((achievement) => String(achievement.id) === String(req.params.id));
-  if (!item) return res.status(404).json({ success: false, error: 'Achievement not found' });
-
-  if (item.image && (item.image.startsWith('/api/uploads/achievements/') || item.image.startsWith('/achievements/'))) {
-    const fileName = decodeURIComponent(item.image.replace('/api/uploads/achievements/', '').replace('/achievements/', ''));
-    const target = path.join(achievementDirectory, path.basename(fileName));
-    if (fs.existsSync(target)) fs.unlinkSync(target);
-  }
-  content.achievements = achievements.filter((achievement) => String(achievement.id) !== String(req.params.id));
-  saveAdminContent(content);
-  res.json({ success: true, data: content });
-});
-
-app.get('/api/admin/messages', requireAdmin, async (req, res) => {
-  try {
-    if (!isMongoDBConnected) {
-      const data = fs.existsSync(messagesFilePath) ? JSON.parse(fs.readFileSync(messagesFilePath, 'utf8')) : [];
-      return res.json({ success: true, data });
-    }
-    const messages = await Message.find().sort({ createdAt: -1 });
-    res.json({ success: true, data: messages });
-  } catch (error) {
-    res.status(500).json({ success: false, error: 'Could not load messages' });
-  }
 });
 
 app.get('/api/portfolio/personal', (req, res) => {
@@ -940,165 +818,6 @@ app.post('/api/messages', async (req, res) => {
       success: false,
       error: 'Server error: ' + error.message
     });
-  }
-});
-
-// GET - Retrieve all messages (admin view)
-app.get('/api/messages', async (req, res) => {
-  try {
-    const messages = await Message.find().sort({ createdAt: -1 });
-    res.json({
-      success: true,
-      count: messages.length,
-      data: messages
-    });
-  } catch (error) {
-    console.error('Error retrieving messages:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to retrieve messages'
-    });
-  }
-});
-
-// GET - Retrieve unread messages count
-app.get('/api/messages/stats/unread', async (req, res) => {
-  try {
-    const unreadCount = await Message.countDocuments({ isRead: false });
-    res.json({
-      success: true,
-      unreadCount
-    });
-  } catch (error) {
-    console.error('Error retrieving unread count:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to retrieve unread count'
-    });
-  }
-});
-
-// PUT - Mark message as read
-app.put('/api/messages/:id/read', async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Validate MongoDB ObjectId
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid message ID'
-      });
-    }
-
-    const message = await Message.findByIdAndUpdate(
-      id,
-      { isRead: true },
-      { new: true }
-    );
-
-    if (!message) {
-      return res.status(404).json({
-        success: false,
-        error: 'Message not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Message marked as read',
-      data: message
-    });
-  } catch (error) {
-    console.error('Error marking message as read:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to update message'
-    });
-  }
-});
-
-// DELETE - Delete a message
-app.delete('/api/messages/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Validate MongoDB ObjectId
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid message ID'
-      });
-    }
-
-    const message = await Message.findByIdAndDelete(id);
-
-    if (!message) {
-      return res.status(404).json({
-        success: false,
-        error: 'Message not found'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Message deleted successfully'
-    });
-  } catch (error) {
-    console.error('Error deleting message:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to delete message'
-    });
-  }
-});
-
-// DEBUG: Test Sheets append without submitting the contact form
-app.get('/api/test-sheet', async (req, res) => {
-  try {
-    // Initialize if needed
-    initSheetsClient();
-    if (!sheetsClient) {
-      return res.status(500).json({ success: false, error: 'Google Sheets not configured or keyfile missing' });
-    }
-
-    const sample = {
-      name: 'Test User',
-      email: 'test@example.com',
-      message: 'This is a test row appended at ' + new Date().toISOString()
-    };
-
-    const ok = await appendRowToSheet(sample);
-    if (ok) return res.json({ success: true, message: 'Appended test row to sheet' });
-    return res.status(500).json({ success: false, error: 'Failed to append to sheet (check server logs)' });
-  } catch (err) {
-    console.error('Test sheet endpoint error:', err.message);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// ADMIN: Resend locally saved messages in messages.json to Google Sheets
-app.post('/api/resend-messages-to-sheet', async (req, res) => {
-  try {
-    initSheetsClient();
-    if (!sheetsClient) return res.status(500).json({ success: false, error: 'Google Sheets not configured' });
-
-    if (!fs.existsSync(messagesFilePath)) return res.status(404).json({ success: false, error: 'No messages.json file found' });
-
-    const data = fs.readFileSync(messagesFilePath, 'utf8');
-    const messages = JSON.parse(data || '[]');
-    let appended = 0;
-    for (const m of messages) {
-      const ok = await appendRowToSheet({ name: m.name, email: m.email, message: m.message });
-      if (ok) appended++;
-      // small delay to avoid quota bursts
-      await new Promise(r => setTimeout(r, 200));
-    }
-
-    res.json({ success: true, appended, total: messages.length });
-  } catch (err) {
-    console.error('Resend messages error:', err.message);
-    res.status(500).json({ success: false, error: err.message });
   }
 });
 

@@ -15,7 +15,6 @@ import Achievements from './components/Achievements';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import fallbackData from './data';
-import AdminPage from './components/AdminPage';
 
 function App() {
   const [portfolioData, setPortfolioData] = useState(fallbackData);
@@ -88,7 +87,6 @@ function App() {
           <Route path="/gallery" element={<Gallery data={portfolioData?.gallery} />} />
           <Route path="/resume" element={<ResumePage resume={portfolioData?.resume} />} />
           <Route path="/achievements" element={<Achievements data={portfolioData?.achievements} page />} />
-          <Route path="/admin" element={<AdminPage />} />
           <Route path="/contact" element={<Contact data={portfolioData?.personal} />} />
         </Routes>
         <Footer />
