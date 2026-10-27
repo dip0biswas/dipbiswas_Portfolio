@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { apiUrl } from '../api';
 
 function ResumePage({ resume = '/resume.pdf' }) {
   return (
@@ -19,7 +20,7 @@ function ResumePage({ resume = '/resume.pdf' }) {
 
         <div className="flex flex-wrap gap-3 pt-2">
           <a
-            href={resume}
+            href={apiUrl(resume)}
             download="Biswas_Dip_Resume.pdf"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900 text-white text-sm font-semibold hover:bg-gray-700 transition"
           >
@@ -37,7 +38,7 @@ function ResumePage({ resume = '/resume.pdf' }) {
       <section className="max-w-7xl mx-auto px-4 pb-12 md:pb-16">
         <div className="rounded-[28px] overflow-hidden border border-gray-200 shadow-[0_20px_60px_rgba(17,17,17,0.12)] bg-gray-50">
           <iframe
-            src={resume}
+            src={apiUrl(resume)}
             title="Resume PDF"
             className="w-full"
             style={{ height: '800px' }}

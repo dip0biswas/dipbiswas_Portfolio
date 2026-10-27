@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiUrl } from '../api';
 
 function Gallery({ data }) {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -71,7 +72,7 @@ function Gallery({ data }) {
       accent: 'md:col-span-2',
     },
   ];
-  const galleryImages = data && data.length > 0 ? data : defaultGalleryImages;
+  const galleryImages = Array.isArray(data) ? data : defaultGalleryImages;
 
   return (
     <main className="bg-[#f7f5f1]">
@@ -114,7 +115,7 @@ function Gallery({ data }) {
               className={`group relative overflow-hidden rounded-lg bg-gray-200 text-left shadow-[0_10px_20px_rgba(17,17,17,0.08)] aspect-square`}
             >
               <img
-                src={item.image}
+                src={apiUrl(item.image)}
                 alt={item.title}
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
@@ -136,6 +137,9 @@ function Gallery({ data }) {
             </button>
           ))}
         </div>
+        {galleryImages.length === 0 && (
+          <p className="py-10 text-center text-sm text-gray-500">Gallery items will appear here soon.</p>
+        )}
       </section>
 
       {selectedImage && (
@@ -162,7 +166,7 @@ function Gallery({ data }) {
               <div className="bg-[#f4f1eb] p-4 md:p-6">
                 <div className="overflow-hidden rounded-[24px] bg-gray-200 aspect-[4/3] md:aspect-[5/4]">
                   <img
-                    src={selectedImage.image}
+                    src={apiUrl(selectedImage.image)}
                     alt={selectedImage.title}
                     className="h-full w-full object-cover"
                   />

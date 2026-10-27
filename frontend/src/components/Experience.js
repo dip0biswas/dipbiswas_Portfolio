@@ -1,41 +1,59 @@
 import React from 'react';
 
-function Experience({ data }) {
-  if (!data) return null;
+function ExperienceIcon({ position = '' }) {
+  const role = position.toLowerCase();
+
+  if (role.includes('design')) {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="m4 20 4.2-1 10.9-10.9a2.1 2.1 0 0 0-3-3L5.2 16 4 20Zm10.8-13 3 3M4 5l15 15M5 12l7 7" />
+      </svg>
+    );
+  }
 
   return (
-    <section id="experience" className="py-6 md:py-8 bg-white">
-      <div className="max-w-7xl mx-auto px-4">
-        <p className="text-xs uppercase tracking-[0.35em] text-orange-500 font-semibold mb-3">
-          Experience
-        </p>
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="m8 5-6 7 6 7M16 5l6 7-6 7M14 3l-4 18" />
+    </svg>
+  );
+}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 border-t border-l border-gray-200">
-          {data.map((exp, index) => (
-            <article
-              key={exp.id}
-              className="min-h-[220px] border-r border-b border-gray-200 p-4 md:p-5 hover:bg-gray-50 transition-colors duration-200"
-            >
-              <p className="text-sm uppercase tracking-[0.35em] text-orange-500 mb-4">
-                {String(index + 1).padStart(2, '0')}
-              </p>
+function Experience({ data }) {
+  if (!data || data.length === 0) return null;
 
-              <h3 className="text-xl font-black text-gray-900 mb-2 leading-tight">
-                {exp.position}
-              </h3>
+  return (
+    <section id="experience" className="experience-section">
+      <h2 className="experience-heading">Experience</h2>
 
-              <p className="text-sm uppercase tracking-[0.25em] text-gray-500 mb-1">
-                {exp.company}
-              </p>
+      <div className="experience-timeline">
+        {data.map((experience) => {
+          const descriptions = Array.isArray(experience.description)
+            ? experience.description
+            : experience.description
+              ? [experience.description]
+              : [];
 
-              <p className="text-sm text-gray-500 mb-3">{exp.period}</p>
-
-              <p className="text-sm text-gray-600 leading-relaxed">
-                {exp.description?.[0]}
-              </p>
+          return (
+            <article className="experience-entry" key={experience.id || `${experience.company}-${experience.position}`}>
+              <span className="experience-timeline-dot" aria-hidden="true" />
+              <span className="experience-role-icon">
+                <ExperienceIcon position={experience.position} />
+              </span>
+              <div className="experience-card">
+                <h3>{experience.position}</h3>
+                <p className="experience-company">{experience.company}</p>
+                <p className="experience-period">{experience.period}</p>
+                {descriptions.length > 0 && (
+                  <ul>
+                    {descriptions.map((description, index) => (
+                      <li key={`${experience.id || experience.company}-${index}`}>{description}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </article>
-          ))}
-        </div>
+          );
+        })}
       </div>
     </section>
   );

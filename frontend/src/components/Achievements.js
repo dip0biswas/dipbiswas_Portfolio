@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { apiUrl } from '../api';
 
 function Achievements({ data, page = false }) {
   const [selectedAchievement, setSelectedAchievement] = useState(null);
-  const apiBase = process.env.REACT_APP_API_URL
-    || (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : '');
-
-  const assetUrl = (url) => {
-    if (!url || !url.startsWith('/api/')) return url;
-    return `${apiBase}${url}`;
-  };
 
   useEffect(() => {
     if (!selectedAchievement) return undefined;
@@ -33,7 +27,7 @@ function Achievements({ data, page = false }) {
         <section className="max-w-7xl mx-auto px-4 pb-12 md:pb-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {data.map((achievement) => {
-              const imageUrl = assetUrl(achievement.image);
+              const imageUrl = apiUrl(achievement.image);
               const isPdf = /\.pdf(?:$|\?)/i.test(achievement.image || '');
               return (
                 <button
@@ -69,9 +63,9 @@ function Achievements({ data, page = false }) {
             <button type="button" onClick={() => setSelectedAchievement(null)} className="absolute right-4 top-4 z-10 h-10 w-10 rounded-full bg-gray-900 text-white" aria-label="Close achievement details">×</button>
             <div className="min-h-[360px] bg-[#f0f0f2] p-4 md:p-6 flex items-center justify-center">
               {selectedAchievement.image && /\.pdf(?:$|\?)/i.test(selectedAchievement.image) ? (
-                <iframe src={assetUrl(selectedAchievement.image)} title={selectedAchievement.title} className="h-[70vh] w-full bg-white" />
+                <iframe src={apiUrl(selectedAchievement.image)} title={selectedAchievement.title} className="h-[70vh] w-full bg-white" />
               ) : selectedAchievement.image ? (
-                <img src={assetUrl(selectedAchievement.image)} alt={selectedAchievement.title} className="max-h-[70vh] max-w-full object-contain" />
+                <img src={apiUrl(selectedAchievement.image)} alt={selectedAchievement.title} className="max-h-[70vh] max-w-full object-contain" />
               ) : <p className="text-gray-500">No certificate image uploaded.</p>}
             </div>
             <div className="p-6 md:p-8">
@@ -79,7 +73,7 @@ function Achievements({ data, page = false }) {
               <h2 className="text-2xl md:text-3xl font-black text-gray-900">{selectedAchievement.title}</h2>
               <p className="mt-4 text-sm text-gray-600"><strong>Year:</strong> {selectedAchievement.year || 'Not specified'}</p>
               {selectedAchievement.description && <p className="mt-4 text-sm text-gray-600 whitespace-pre-line">{selectedAchievement.description}</p>}
-              {selectedAchievement.image && <a href={assetUrl(selectedAchievement.image)} target="_blank" rel="noopener noreferrer" className="mt-6 inline-block rounded-lg bg-gray-900 px-4 py-2 text-sm text-white">Open full certificate</a>}
+              {selectedAchievement.image && <a href={apiUrl(selectedAchievement.image)} target="_blank" rel="noopener noreferrer" className="mt-6 inline-block rounded-lg bg-gray-900 px-4 py-2 text-sm text-white">Open full certificate</a>}
             </div>
           </div>
         </div>

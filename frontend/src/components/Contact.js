@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiUrl } from '../api';
 
 function Contact({ data }) {
   const [formData, setFormData] = useState({
@@ -23,7 +24,7 @@ function Contact({ data }) {
     setStatus('');
 
     try {
-      const response = await fetch('/api/messages', {
+      const response = await fetch(apiUrl('/api/messages'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,46 +55,36 @@ function Contact({ data }) {
   return (
     <section id="contact" className="py-16 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4">
-        <p className="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-12">
-          Get in Touch
-        </p>
-
         <div className="grid md:grid-cols-2 gap-12">
           <div>
-            <p className="text-base font-black text-gray-900 mb-8 uppercase tracking-wide">Contact Information</p>
+            <p className="contact-eyebrow">Get in touch</p>
+            <h2 className="contact-heading">Let's build something amazing together.</h2>
+            <p className="contact-intro">Have a project in mind or want to discuss full-stack opportunities? Send me a message.</p>
             <div className="space-y-8">
-              <div className="border-b border-gray-200 pb-8">
+              <div className="contact-detail border-b border-gray-200 pb-8">
                 <p className="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-2">Email</p>
                 <a href={`mailto:${data.email}`} className="text-base text-gray-900 hover:text-gray-600">
                   {data.email}
                 </a>
               </div>
-              <div className="border-b border-gray-200 pb-8">
+              <div className="contact-detail border-b border-gray-200 pb-8">
                 <p className="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-2">Phone</p>
                 <a href={`tel:${data.phone}`} className="text-base text-gray-900 hover:text-gray-600">
                   {data.phone}
                 </a>
               </div>
-              <div>
-                <p className="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-2">LinkedIn</p>
-                <a href={data.linkedin} target="_blank" rel="noopener noreferrer" className="text-base text-gray-900 hover:text-gray-600">
-                  Connect with me
-                </a>
+              <div className="contact-detail">
+                <p className="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-2">Location</p>
+                <span className="text-base text-gray-900">{data.location}</span>
               </div>
 
               <div className="pt-4 border-t border-gray-200">
                 <div className="flex flex-wrap gap-6 text-sm md:text-base font-medium">
-                  <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-orange-500 hover:text-orange-600 transition flex items-center gap-1">
-                    Instagram <span aria-hidden="true">↗</span>
+                  <a href={data.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-900 transition flex items-center gap-1">
+                    LinkedIn <span aria-hidden="true">↗</span>
                   </a>
                   <a href={`mailto:${data.email}`} className="text-gray-500 hover:text-gray-900 transition flex items-center gap-1">
                     Email <span aria-hidden="true">↗</span>
-                  </a>
-                  <a href={data.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-900 transition flex items-center gap-1">
-                    Linkedin <span aria-hidden="true">↗</span>
-                  </a>
-                  <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-gray-900 transition flex items-center gap-1">
-                    x (Twitter) <span aria-hidden="true">↗</span>
                   </a>
                 </div>
               </div>
@@ -102,39 +93,42 @@ function Contact({ data }) {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-xs uppercase tracking-widest text-gray-500 font-semibold mb-3">Name</label>
+              <label htmlFor="contact-name" className="block text-xs uppercase tracking-widest text-gray-500 font-semibold mb-3">Your name</label>
               <input
+                id="contact-name"
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-3 border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900"
-                placeholder="Your Name"
+                placeholder="John Doe"
               />
             </div>
             <div>
-              <label className="block text-xs uppercase tracking-widest text-gray-500 font-semibold mb-3">Email</label>
+              <label htmlFor="contact-email" className="block text-xs uppercase tracking-widest text-gray-500 font-semibold mb-3">Your email</label>
               <input
+                id="contact-email"
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-3 border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900"
-                placeholder="your@email.com"
+                placeholder="john@example.com"
               />
             </div>
             <div>
-              <label className="block text-xs uppercase tracking-widest text-gray-500 font-semibold mb-3">Message</label>
+              <label htmlFor="contact-message" className="block text-xs uppercase tracking-widest text-gray-500 font-semibold mb-3">Message</label>
               <textarea
+                id="contact-message"
                 name="message"
                 value={formData.message}
                 onChange={handleChange}
                 required
                 rows="4"
                 className="w-full px-4 py-3 border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900"
-                placeholder="Your message here..."
+                placeholder="Tell me about your project or inquiry..."
               ></textarea>
             </div>
             <button
@@ -142,7 +136,7 @@ function Contact({ data }) {
               disabled={loading}
               className="w-full bg-gray-900 text-white font-black py-4 uppercase tracking-wider hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Sending...' : 'Send Message'}
+              {loading ? 'Sending...' : 'Send Message  ↗'}
             </button>
             
             {/* Status Messages */}

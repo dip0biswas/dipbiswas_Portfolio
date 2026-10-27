@@ -1,7 +1,25 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-function ProjectDetailPage({ data }) {
+function Stat({ icon, label, value }) {
+  return (
+    <div className="project-stat">
+      <span className="project-stat-icon" aria-hidden="true">{icon}</span>
+      <strong>{value ?? 0}</strong>
+      <span>{label}</span>
+    </div>
+  );
+}
+
+function GitHubMark() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.53v-2.08c-3.1.67-3.76-1.32-3.76-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15 1 .1.44 2.1 3.77 1.5.1-.72.39-1.22.7-1.5-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.44-2.22 1.15-3-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.05 1.15a10.6 10.6 0 0 1 5.55 0c2.12-1.44 3.05-1.15 3.05-1.15.61 1.54.23 2.68.11 2.96.72.78 1.15 1.78 1.15 3 0 4.3-2.61 5.23-5.1 5.51.4.35.75 1.02.75 2.06v3.05c0 .3.2.64.77.53A11.1 11.1 0 0 0 12 .9Z" />
+    </svg>
+  );
+}
+
+function ProjectDetailPage({ data, personal }) {
   const { projectId } = useParams();
 
   if (!data || data.length === 0) return null;
@@ -10,117 +28,111 @@ function ProjectDetailPage({ data }) {
   const project = data[currentIndex] || data[0];
   const previousProject = data[(currentIndex - 1 + data.length) % data.length];
   const nextProject = data[(currentIndex + 1) % data.length];
-  const images = project.detailImages && project.detailImages.length > 0
-    ? project.detailImages
-    : [project.image, project.image, project.image, project.image].filter(Boolean);
+  const repositoryUrl = project.github_url || project.link;
+  const repositoryName = (() => {
+    if (!repositoryUrl) return project.title;
+    try {
+      return new URL(repositoryUrl).pathname.replace(/\/+$/, '').replace(/^\//, '');
+    } catch {
+      return project.title;
+    }
+  })();
+  const technologies = [...new Set([project.language, ...(project.tags || [])].filter(Boolean))].slice(0, 4);
+  const category = project.company?.split(',')[0] || project.category || 'Development';
+  const goal = project.goal || project.description || 'A project built to explore ideas and deliver a useful digital experience.';
+  const results = project.results || '';
+  const hasCustomResults = results && !/^\s*⭐\s*\d+\s+stars\s*\|/i.test(results);
+  const overview = project.overview || project.description || 'Explore the repository for project details, implementation, and development history.';
 
   return (
-    <main className="bg-white">
-      <section className="max-w-7xl mx-auto px-4 pt-8 md:pt-10 pb-6 md:pb-8">
-        <div className="max-w-2xl">
-          <p className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-orange-500 font-semibold mb-2">
-            {project.company}
-          </p>
-          <h1 className="text-2xl md:text-4xl font-black text-gray-900 mb-3 leading-tight">
-            {project.title}
-          </h1>
-          <p className="text-[11px] md:text-sm text-gray-600 leading-relaxed max-w-xl">
-            {project.description}
-          </p>
-          <div className="flex flex-wrap gap-3 mt-3 text-[10px] md:text-xs text-gray-500">
-            {project.language && <span>{project.language}</span>}
-            {project.stars !== undefined && <span>⭐ {project.stars}</span>}
-            {project.forks !== undefined && <span>🍴 {project.forks}</span>}
-            {project.openIssues !== undefined && <span>{project.openIssues} open issues</span>}
-          </div>
-          <div className="flex flex-wrap gap-1.5 mt-3">
-            {(project.tags || []).map((tag) => (
-              <span key={tag} className="px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-700 text-[9px] md:text-[10px] font-semibold border border-gray-200">
-                {tag}
-              </span>
-            ))}
-          </div>
-          {(project.github_url || project.link) && (
-            <div className="mt-4">
-              <div className="flex flex-wrap gap-2">
-                <a
-                  href={project.github_url || project.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-900 text-white text-[10px] md:text-xs font-semibold hover:bg-gray-700 transition-colors"
-                >
-                  Open GitHub Repo <span aria-hidden="true">↗</span>
-                </a>
-                {project.readme_url && (
-                  <a
-                    href={project.readme_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-900 text-gray-900 text-[10px] md:text-xs font-semibold hover:bg-gray-100 transition-colors"
-                  >
-                    Read README
-                  </a>
-                )}
-              </div>
+    <main className="project-detail-page">
+      <div className="project-detail-shell">
+        <section className="project-feature">
+          <div className="project-feature-top">
+            <div>
+              <span className="project-kicker">Featured project</span>
+              <h1>{project.title}</h1>
+              <p>{project.description}</p>
             </div>
-          )}
-        </div>
-      </section>
-
-      <section className="max-w-7xl mx-auto px-4 pb-8 md:pb-10">
-        <div className="grid gap-6 md:gap-8">
-          <div className="max-w-4xl">
-            <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-2">Project Goals & Vision</h2>
-            <p className="text-[11px] md:text-sm text-gray-600 leading-relaxed max-w-2xl">
-              {project.goal}
-            </p>
+            {repositoryUrl && (
+              <a
+                className="project-github-icon"
+                href={repositoryUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Open GitHub repository"
+              >
+                <GitHubMark />
+              </a>
+            )}
           </div>
+        </section>
 
-          <div className="max-w-4xl">
-            <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-2">Key Results & Achievements</h2>
-            <p className="text-[11px] md:text-sm text-gray-600 leading-relaxed max-w-2xl">
-              {project.results}
-            </p>
-          </div>
-
-          <div className="max-w-4xl">
-            <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-2">Project Overview & Development</h2>
-            <p className="text-[11px] md:text-sm text-gray-600 leading-relaxed max-w-2xl">
-              {project.overview}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="max-w-7xl mx-auto px-4 pb-8 md:pb-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 md:gap-3">
-          {images.slice(0, 6).map((image, index) => (
-            <div
-              key={index}
-              className={`rounded-[18px] overflow-hidden bg-gray-100 ${index === 1 ? 'md:row-span-2 min-h-[140px] md:min-h-[280px]' : 'min-h-[130px] md:min-h-[180px]'}`}
-            >
-              <img src={image} alt={`${project.title} ${index + 1}`} className="w-full h-full object-cover" />
+        <section className="project-summary" aria-label="Project repository details">
+          <div className="project-summary-stats">
+            <Stat icon="★" label="Stars" value={project.stars} />
+            <span className="project-stat-divider" aria-hidden="true" />
+            <Stat icon="⑂" label="Forks" value={project.forks} />
+            <div className="project-tags">
+              {(technologies.length ? technologies : ['Development']).map((tag) => (
+                <span key={tag}>{tag}</span>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
+          <div className="project-summary-actions">
+            {repositoryUrl && (
+              <a className="project-action project-action-primary" href={repositoryUrl} target="_blank" rel="noopener noreferrer">
+                Open GitHub Repo <span aria-hidden="true">↗</span>
+              </a>
+            )}
+            {project.readme_url && (
+              <a className="project-action project-action-secondary" href={project.readme_url} target="_blank" rel="noopener noreferrer">
+                Read README
+              </a>
+            )}
+          </div>
+        </section>
 
-      <section className="max-w-7xl mx-auto px-4 pb-8 md:pb-10">
-        <div className="flex items-center justify-between gap-4 pt-3 border-t border-gray-200">
-          <Link
-            to={`/projects/${previousProject.id}`}
-            className="text-[10px] md:text-xs text-gray-900 hover:text-gray-600 transition flex items-center gap-1.5"
-          >
-            <span aria-hidden="true">←</span> Previous
-          </Link>
-          <Link
-            to={`/projects/${nextProject.id}`}
-            className="text-[10px] md:text-xs text-gray-900 hover:text-gray-600 transition flex items-center gap-1.5"
-          >
-            Next project <span aria-hidden="true">→</span>
-          </Link>
-        </div>
-      </section>
+        <section className="project-insight-grid">
+          <article className="project-insight-card">
+            <h2>Project Goals &amp; Vision</h2>
+            <p>{goal}</p>
+          </article>
+
+          <article className="project-insight-card project-results-card">
+            <h2>Key Results &amp; Achievements</h2>
+            {hasCustomResults && <p>{results}</p>}
+            <div className="project-result-stats">
+              <Stat icon="★" label="Stars" value={project.stars} />
+              <Stat icon="○" label="Open Issues" value={project.openIssues} />
+              <Stat icon="⑂" label="Forks" value={project.forks} />
+            </div>
+          </article>
+
+          <article className="project-insight-card">
+            <h2>Project Overview &amp; Development</h2>
+            <p>{overview}</p>
+          </article>
+        </section>
+
+        <section className="repository-insights" aria-label="Repository insights">
+          <h2>Repository Insights: <span>{repositoryName}</span></h2>
+          <div className="repository-techs">
+            {technologies.length ? technologies.map((technology) => (
+              <span key={technology}>{technology}</span>
+            )) : <span>{category}</span>}
+          </div>
+          <div className="repository-owner">
+            <img src={personal?.avatar || '/profile.jpeg'} alt="" />
+            <span>{personal?.name || 'Dip Biswas'}</span>
+          </div>
+        </section>
+
+        <nav className="project-pagination" aria-label="Project navigation">
+          <Link to={`/projects/${previousProject.id}`}><span aria-hidden="true">‹</span> Previous</Link>
+          <Link to={`/projects/${nextProject.id}`}>Next <span aria-hidden="true">›</span></Link>
+        </nav>
+      </div>
     </main>
   );
 }

@@ -1,86 +1,72 @@
 {
   "personal": {
-    "name": "Dip Biswas",
-    "title": "Exploring technology, design, and innovation through thoughtful work and experimentation",
-    "location": "Rajbari, Dhaka",
-    "email": "bdip470@gmail.com",
-    "about": "Graduate with practical experience in web development, UI/UX design, and graphic design. I enjoy learning new technologies, solving\nproblems, and creating simple, user-friendly digital solutions. I’m a fast learner who can easily adapt to new environments and situations, work\nwell with others, and take on new challenges. I’m looking for an opportunity to apply my skills, gain real-world experience, and grow\nprofessionally."
+    "name": "DIP BISWAS",
+    "title": "Information Technology Graduate",
+    "role": "Web Developer • UI/UX Designer",
+    "location": "Rajbari, Bangladesh",
+    "email": "bddip470@gmail.com",
+    "phone": "+880 1707690536",
+    "linkedin": "https://www.linkedin.com/in/dip-biswas-7b897a243/",
+    "website": "https://dipbiswas.netlify.app",
+    "about": "Information Technology graduate (B.E., 2026) with hands-on experience in web development, UI/UX design, and graphic design. Builds responsive web applications with React, Next.js, and Node.js, and enjoys creating simple, user-friendly digital solutions. Fast learner who adapts quickly, works well in teams, and welcomes new challenges. Seeking an entry-level role to apply my skills, gain real-world experience, and grow professionally."
   },
   "achievements": [
     {
       "id": 1,
-      "title": "Got The IEEE Start Award",
-      "year": 2023
+      "title": "IEEE Start Award",
+      "year": 2023,
+      "type": "Award"
     },
     {
       "id": 2,
-      "title": "1st Position - Web Design Competition by Hack TechSociety",
-      "year": 2023
+      "title": "1st Position - Web Design Competition, Hack TechSociety",
+      "year": 2024,
+      "type": "Achievement"
     },
     {
       "id": 3,
-      "title": "1st Position - Photography Competition by Photonics Society",
-      "year": 2023
+      "title": "1st Position - Photography Competition, Photonics Society, Chandigarh University",
+      "year": 2025,
+      "type": "Achievement"
     },
     {
       "id": "1791014920608",
-      "title": "Wireless Communications for Everybody.pdf",
+      "title": "Wireless Communications for Everybody",
       "year": 2026,
       "type": "Certificate",
       "image": "/api/uploads/achievements/Coursera%20Wireless%20Communications%20for%20Everybody.pdf"
     },
     {
       "id": "1791014949839",
-      "title": "Machine Learning Introduction for Everyone.pdf",
+      "title": "Machine Learning Introduction for Everyone",
       "year": 2026,
       "type": "Certificate",
       "image": "/api/uploads/achievements/Coursera%20Machine%20Learning%20Introduction%20for%20Everyone.pdf"
     },
     {
       "id": "1791014959827",
-      "title": "Theory of Angular Momentum.pdf",
+      "title": "Theory of Angular Momentum",
       "year": 2026,
       "type": "Certificate",
       "image": "/api/uploads/achievements/Coursera%20Theory%20of%20Angular%20Momentum.pdf"
     },
     {
       "id": "1791014969671",
-      "title": "React Native.pdf",
+      "title": "React Native",
       "year": 2026,
       "type": "Certificate",
       "image": "/api/uploads/achievements/Coursera%20React%20Native.pdf"
     },
     {
       "id": "1791015014077",
-      "title": "5G Mobile Networks.pdf",
+      "title": "5G Mobile Networks",
       "year": 2026,
       "type": "Certificate",
       "image": "/api/uploads/achievements/Coursera%20%205G%20Mobile%20Networks.pdf"
     },
     {
-      "id": "1791015023150",
-      "title": "4G Network Fundamentals.pdf",
-      "year": 2026,
-      "type": "Certificate",
-      "image": "/api/uploads/achievements/Coursera%204G%20Network%20Fundamentals.pdf"
-    },
-    {
-      "id": "1791015031618",
-      "title": "Supply Chain Excellence.pdf",
-      "year": 2026,
-      "type": "Certificate",
-      "image": "/api/uploads/achievements/Coursera_Supply%20Chain%20Excellence.pdf"
-    },
-    {
-      "id": "1791015040446",
-      "title": "Mastering Logistics & Supply Chain Management.pdf",
-      "year": 2026,
-      "type": "Certificate",
-      "image": "/api/uploads/achievements/Coursera_Mastering%20Logistics%20%26%20Supply%20Chain%20Management.pdf"
-    },
-    {
       "id": "1791015561745",
-      "title": "Industrial IoT Markets and Security.pdf",
+      "title": "Industrial IoT Markets and Security",
       "year": 2026,
       "type": "Certificate",
       "image": "/api/uploads/achievements/Coursera%20Industrial%20IoT%20Markets%20and%20Security.pdf"
@@ -157,84 +143,100 @@
       "id": 1,
       "degree": "Bachelor of Engineering in Information Technology",
       "institution": "Chandigarh University",
-      "period": "Completed in 2022",
-      "details": ""
+      "period": "Completed 2026",
+      "details": "Mohali, Punjab, India"
     },
     {
       "id": 2,
-      "degree": "Class 12",
-      "institution": "Kumarkhatri Govt. College, Kushia",
-      "period": "Completed in 2022"
+      "degree": "Higher Secondary (Class 12)",
+      "institution": "Kumarkhali Govt. College, Kushtia",
+      "period": "Completed 2021",
+      "details": "Kushtia, Bangladesh"
     }
   ],
   "experience": [
     {
       "id": 1,
-      "company": "IEEE Computer Society",
-      "position": "Graphic Designer & Webmaster",
-      "period": "Jan 2023 - Dec 2024",
+      "company": "UnceFab",
+      "position": "Web Developer",
+      "period": "Feb 2024 – Nov 2025",
       "description": [
-        "Designed promotional materials and managed the chapter website."
+        "Updated and maintained the UnceFab website, including content, product listings, and promotional materials.",
+        "Collaborated with the design team to build responsive, mobile-friendly web pages aligned with the brand’s aesthetics."
       ]
     },
     {
       "id": 2,
-      "company": "UncleFAB",
-      "position": "Web Developer",
-      "period": "2023 - 2025",
+      "company": "IEEE Computer Society",
+      "position": "Graphic Designer & Webmaster",
+      "period": "Jan 2023 – Dec 2024",
       "description": [
-        "Maintained responsive web pages and promotional content."
+        "Managed and updated the chapter’s website, posting events and relevant content on time.",
+        "Designed promotional materials (posters, social media graphics) to support events and branding.",
+        "Worked with the marketing team to deliver visually cohesive content on a consistent schedule."
       ]
     }
   ],
   "projects": [
     {
-      "id": "dipbiswas_Portfolio",
-      "title": "Dipbiswas Portfolio",
-      "company": "dip0biswas / main",
-      "description": "A portfolio project",
+      "id": 1,
+      "title": "BloodGroup Finder",
+      "company": "Healthcare Project",
+      "description": "Developed a system to identify and determine blood groups for medical use.",
       "tags": [
-        "Development"
+        "Healthcare",
+        "Medical Tech",
+        "System Design"
       ],
-      "image": "https://opengraph.githubassets.com/1/dip0biswas/dipbiswas_Portfolio",
-      "year": "2026",
-      "goal": "Explore the dipbiswas_Portfolio repository.",
-      "results": "GitHub repository: https://github.com/dip0biswas/dipbiswas_Portfolio",
-      "overview": "Updated 03/10/2026.",
-      "detailImages": [
-        "https://opengraph.githubassets.com/1/dip0biswas/dipbiswas_Portfolio"
-      ],
-      "link": "https://github.com/dip0biswas/dipbiswas_Portfolio",
-      "github_url": "https://github.com/dip0biswas/dipbiswas_Portfolio",
-      "readme_url": "https://github.com/dip0biswas/dipbiswas_Portfolio#readme",
-      "stars": 0,
-      "forks": 0,
-      "language": "",
-      "updated_at": "2026-10-03T07:00:23Z"
+      "year": "2025",
+      "goal": "Support safe blood donation and emergency blood transfusion management.",
+      "results": "Built a dependable solution for medical identification and emergency support workflows.",
+      "overview": "A practical healthcare system focused on fast and accurate blood group detection for medical use cases."
     },
     {
-      "id": "Snake_Game",
-      "title": "Snake Game",
-      "company": "dip0biswas / main",
-      "description": "A portfolio project",
+      "id": 2,
+      "title": "Travel Management System",
+      "company": "Booking Platform",
+      "description": "Developed a single platform for booking buses, trains, hotels, and flights.",
       "tags": [
-        "Java"
+        "Travel",
+        "Booking",
+        "Web App"
       ],
-      "image": "https://opengraph.githubassets.com/1/dip0biswas/Snake_Game",
-      "year": "2026",
-      "goal": "Explore the Snake_Game repository.",
-      "results": "GitHub repository: https://github.com/dip0biswas/Snake_Game",
-      "overview": "Updated 03/10/2026.",
-      "detailImages": [
-        "https://opengraph.githubassets.com/1/dip0biswas/Snake_Game"
+      "year": "2025",
+      "goal": "Create a unified travel booking system with reservation management and scheduling.",
+      "results": "Streamlined booking workflows and integrated secure payment processing.",
+      "overview": "A full-stack travel app designed to simplify trip planning and reservation management across key travel services."
+    },
+    {
+      "id": 3,
+      "title": "Restaurant QR Order System",
+      "company": "Food Tech Project",
+      "description": "Developed a QR-based ordering system that lets customers view menus and place orders from their smartphones.",
+      "tags": [
+        "QR Ordering",
+        "UX",
+        "Restaurant Tech"
       ],
-      "link": "https://github.com/dip0biswas/Snake_Game",
-      "github_url": "https://github.com/dip0biswas/Snake_Game",
-      "readme_url": "https://github.com/dip0biswas/Snake_Game#readme",
-      "stars": 0,
-      "forks": 0,
-      "language": "Java",
-      "updated_at": "2026-10-03T06:11:47Z"
+      "year": "2025",
+      "goal": "Improve ordering speed and reduce manual errors in restaurant service.",
+      "results": "Enabled real-time order management and faster service for customers and staff.",
+      "overview": "A digital ordering solution built to improve the restaurant experience through contactless menu browsing and order updates."
+    },
+    {
+      "id": 4,
+      "title": "Face Recognition System",
+      "company": "Security & AI Project",
+      "description": "Developed a system to identify and verify users using image processing techniques.",
+      "tags": [
+        "Computer Vision",
+        "AI",
+        "Security"
+      ],
+      "year": "2025",
+      "goal": "Implement real-time face detection and authentication for secure access workflows.",
+      "results": "Improved security and authentication accuracy with reliable real-time identification.",
+      "overview": "An AI-driven face verification system focused on authentication accuracy, speed, and practical security use cases."
     }
   ],
   "toolbox": [
@@ -297,5 +299,28 @@
       "avatar": "👩"
     }
   ],
-  "skills": []
+  "skills": [
+    "JavaScript",
+    "React.js",
+    "Next.js",
+    "Node.js",
+    "Express.js",
+    "HTML",
+    "CSS",
+    "Tailwind CSS",
+    "MongoDB",
+    "MySQL",
+    "SQL",
+    "Python",
+    "Machine Learning",
+    "Computer Vision",
+    "IoT",
+    "REST APIs",
+    "Git",
+    "GitHub",
+    "Problem Solving",
+    "Adaptability",
+    "Teamwork",
+    "Leadership"
+  ]
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { apiUrl } from '../api';
 
 function ProjectsPage({ data }) {
   if (!data) return null;
@@ -29,10 +30,10 @@ function ProjectsPage({ data }) {
             Work
           </p>
           <h1 className="text-xl md:text-2xl font-black text-gray-900 mb-3">
-            GitHub Projects
+            Selected Projects
           </h1>
           <p className="text-xs md:text-sm text-gray-600 max-w-2xl">
-            My latest public repositories updated in real-time from GitHub.
+            A selection of projects, experiments, and work.
           </p>
         </div>
 
@@ -48,7 +49,7 @@ function ProjectsPage({ data }) {
             >
               {project.image && (
                 <img
-                  src={project.image}
+                  src={apiUrl(project.image)}
                   alt=""
                   className="absolute inset-0 w-full h-full object-cover"
                   loading="lazy"

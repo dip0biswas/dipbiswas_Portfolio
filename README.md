@@ -18,6 +18,7 @@ Portfolio Dip Biswas/
 - **Smooth Scrolling**: Easy navigation between sections
 - **Contact Form**: Built-in contact functionality using mailto
 - **Social Links**: Direct links to LinkedIn and email
+- **Admin workspace**: Firebase-authenticated content and inquiry management at `/admin`
 
 ## Tech Stack
 
@@ -49,16 +50,24 @@ npm install
 
 3. Create a `.env` file:
 ```
-PORT=5000
+PORT=5001
 NODE_ENV=development
+FIREBASE_PROJECT_ID=your-firebase-project-id
+ADMIN_EMAILS=bdip470@gmail.com
+FIREBASE_SERVICE_ACCOUNT_JSON=
 ```
+
+Configure Firebase Admin with either `FIREBASE_SERVICE_ACCOUNT_JSON` (the
+service-account JSON as one environment value) or Google Application Default
+Credentials. Keep service-account credentials private and out of source control.
+See [backend/.env.example](backend/.env.example) for the full template.
 
 4. Start the server:
 ```bash
 npm run dev
 ```
 
-The API will be available at `http://localhost:5000`
+The API will be available at `http://localhost:5001`
 
 ### Frontend Setup
 
@@ -79,9 +88,32 @@ npm start
 
 The frontend will open at `http://localhost:3000`
 
+To enable sign-in, create a Firebase project, register a Web app, enable the
+Email/Password provider in Firebase Authentication, and create the authorized
+administrator account `bdip470@gmail.com`. Set its password in Firebase Console
+or use **Forgot your password?** on the admin sign-in screen to receive a reset
+link. There is no default admin password. Verify that account's email before
+using the panel. Copy the Firebase Web app settings into `frontend/.env` using
+[frontend/.env.example](frontend/.env.example), then restart the frontend.
+
+The admin panel is available at `/admin`. All write APIs and uploads require a
+valid Firebase ID token, a verified email, and an email listed in the backend's
+`ADMIN_EMAILS` setting. The dashboard manages projects, gallery items,
+achievements, profile details, resume uploads, and contact inquiries. Content
+is persisted in `backend/admin-content.json`; the public site refreshes portfolio
+content automatically. Uploaded files are stored in `frontend/public` so they
+can be served by the existing Express/static hosting setup.
+
 ## API Endpoints
 
 - `GET /api/portfolio` - Get all portfolio data
+- `GET /api/admin/session` - Verify the signed-in administrator
+- `GET /api/admin/portfolio` - Read editable content (administrator only)
+- `PUT /api/admin/portfolio` - Save editable content (administrator only)
+- `GET /api/admin/messages` - Read contact inquiries (administrator only)
+- `PATCH /api/admin/messages/:id` - Mark an inquiry read or unread (administrator only)
+- `DELETE /api/admin/messages/:id` - Delete an inquiry (administrator only)
+- `POST /api/admin/uploads/:kind` - Upload a portfolio image, certificate, or resume (administrator only)
 - `GET /api/portfolio/personal` - Get personal information
 - `GET /api/portfolio/skills` - Get skills list
 - `GET /api/portfolio/experience` - Get work experience
@@ -113,9 +145,10 @@ For this repository layout, both providers are configured automatically:
 - Netlify uses `netlify.toml` and builds from `frontend/`.
 - Vercel uses `vercel.json` and builds from `frontend/`.
 
-The frontend can use the bundled fallback portfolio data without a backend. To
-connect it to a deployed backend API, set `REACT_APP_API_URL` in the hosting
-provider's environment variables before building.
+To connect the frontend to a separately hosted backend, set `REACT_APP_API_URL`
+to the backend origin (without a trailing slash) in the hosting provider's
+environment before building. Leave it unset when Express serves the production
+frontend from the same origin.
 
 ### Backend
 Deploy on Heroku, Railway, or any Node.js hosting service.

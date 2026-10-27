@@ -1,46 +1,54 @@
 import React from 'react';
 
+function GraduationCap() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m2 9 10-5 10 5-10 5L2 9Z" />
+      <path d="M6 11v5c3.5 2.7 8.5 2.7 12 0v-5M22 9v6" />
+    </svg>
+  );
+}
+
 function Education({ data }) {
-  if (!data) return null;
+  if (!data?.length) return null;
 
   return (
-    <section id="education" className="py-6 md:py-8 bg-white">
-      <div className="max-w-7xl mx-auto px-4">
-        <p className="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-6">
-          Formation
-        </p>
+    <section id="education" className="education-section">
+      <div className="education-shell">
+        <h2 className="education-heading">Formation</h2>
+        <div className="education-timeline">
+          {data.map((edu) => {
+            const image = edu.image || (
+              edu.institution === 'Chandigarh University'
+                ? '/chandigarh-university.png'
+                : edu.institution === 'Kumarkhatri Govt. College, Kushia'
+                  ? '/images.png'
+                  : null
+            );
 
-        <div className="space-y-6">
-          {data.map((edu) => (
-            <div key={edu.id} className="border-b border-gray-200 pb-6 last:border-0 flex gap-4">
-              {/* Icon or Image */}
-              {(edu.image || edu.institution === 'Chandigarh University' || edu.institution === 'Kumarkhatri Govt. College, Kushia') ? (
-                <div className="flex-shrink-0 w-16 h-16 flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
-                  <img
-                    src={edu.image || (edu.institution === 'Chandigarh University' ? '/chandigarh-university.png' : '/images.png')}
-                    alt={edu.institution}
-                    className="w-full h-full object-contain p-1"
-                  />
+            return (
+              <article className="education-entry" key={edu.id || edu.institution}>
+                <span className="education-timeline-dot" aria-hidden="true" />
+                <div className="education-logo">
+                  {image ? (
+                    <img src={image} alt={`${edu.institution} logo`} />
+                  ) : edu.icon ? (
+                    <span aria-hidden="true">{edu.icon}</span>
+                  ) : (
+                    <GraduationCap />
+                  )}
                 </div>
-              ) : edu.icon ? (
-                <div className="flex-shrink-0 w-16 h-16 flex items-center justify-center bg-gray-100 rounded-lg text-2xl">
-                  {edu.icon}
+                <div className="education-card">
+                  <h3>{edu.degree || edu.institution}</h3>
+                  {edu.degree && <p className="education-institution">{edu.institution}</p>}
+                  <p className="education-period">
+                    <GraduationCap />
+                    <span>{[edu.period, edu.details].filter(Boolean).join(' · ')}</span>
+                  </p>
                 </div>
-              ) : null}
-              
-              {/* Content */}
-              <div className="flex-1">
-                <h3 className="text-lg font-black text-gray-900 mb-1">
-                  {edu.institution}
-                </h3>
-                <p className="text-base text-gray-600 mb-1">
-                  {edu.degree}
-                </p>
-                <p className="text-sm text-gray-500 mb-3">{edu.period}</p>
-                {edu.details && <p className="text-sm text-gray-600 leading-relaxed">+ {edu.details}</p>}
-              </div>
-            </div>
-          ))}
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>

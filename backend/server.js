@@ -3,7 +3,13 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+const multer = require('multer');
+const { applicationDefault, cert, initializeApp } = require('firebase-admin/app');
+const { getAuth } = require('firebase-admin/auth');
 require('dotenv').config();
+
+const FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID || 'dipbiswas-207c5';
 
 // GitHub API configuration
 const GITHUB_USERNAME = process.env.GITHUB_USERNAME || 'dip0biswas';
@@ -14,6 +20,24 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '15mb' }));
+
+let firebaseAdminApp = null;
+try {
+  if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+    firebaseAdminApp = initializeApp({
+      credential: cert(serviceAccount),
+      projectId: FIREBASE_PROJECT_ID || serviceAccount.project_id
+    });
+  } else {
+    firebaseAdminApp = initializeApp({
+      credential: applicationDefault(),
+      projectId: FIREBASE_PROJECT_ID
+    });
+  }
+} catch (error) {
+  console.error('Firebase Admin initialization failed:', error.message);
+}
 
 // Google Sheets integration (optional)
 const { google } = require('googleapis');
@@ -95,13 +119,105 @@ const testimonialDirectory = path.join(publicDirectory, 'testimonials');
 const projectDirectory = path.join(publicDirectory, 'projects');
 
 const readPortfolioOverrides = () => {
+  if (!fs.existsSync(contentFilePath)) {
+    return { personal: {}, achievements: null, gallery: null, resume: '/resume.pdf' };
+  }
   try {
-    if (fs.existsSync(contentFilePath)) return JSON.parse(fs.readFileSync(contentFilePath, 'utf8'));
+    const content = JSON.parse(fs.readFileSync(contentFilePath, 'utf8'));
+    if (!content || typeof content !== 'object' || Array.isArray(content)) {
+      throw new Error('Portfolio content must be a JSON object.');
+    }
+    return content;
   } catch (error) {
     console.error('Error reading portfolio overrides:', error.message);
+    throw new Error('Saved portfolio content could not be read.');
   }
-  return { personal: {}, achievements: null, gallery: null, resume: '/resume.pdf' };
 };
+
+const writeJsonFileAtomically = (filePath, value) => {
+  const temporaryPath = `${filePath}.${process.pid}.${crypto.randomUUID()}.tmp`;
+  try {
+    fs.writeFileSync(temporaryPath, JSON.stringify(value, null, 2), 'utf8');
+    fs.renameSync(temporaryPath, filePath);
+  } finally {
+    if (fs.existsSync(temporaryPath)) fs.unlinkSync(temporaryPath);
+  }
+};
+
+const requireAdmin = async (req, res, next) => {
+  if (!firebaseAdminApp) {
+    return res.status(503).json({
+      success: false,
+      error: 'Firebase Admin is not configured on the server.'
+    });
+  }
+
+  const adminEmails = (process.env.ADMIN_EMAILS || 'bdip470@gmail.com')
+    .split(',')
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean);
+  if (adminEmails.length === 0) {
+    return res.status(503).json({
+      success: false,
+      error: 'No administrator email is configured on the server.'
+    });
+  }
+
+  const authorization = req.headers.authorization || '';
+  const token = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
+  if (!token) {
+    return res.status(401).json({ success: false, error: 'Authentication is required.' });
+  }
+
+  try {
+    const decodedToken = await getAuth(firebaseAdminApp).verifyIdToken(token);
+    const email = (decodedToken.email || '').trim().toLowerCase();
+    if (!decodedToken.email_verified || !adminEmails.includes(email)) {
+      return res.status(403).json({ success: false, error: 'Administrator access is not permitted.' });
+    }
+    req.admin = { uid: decodedToken.uid, email };
+    return next();
+  } catch (error) {
+    console.error('Admin token verification failed:', error.message);
+    return res.status(401).json({ success: false, error: 'The sign-in token is invalid or expired.' });
+  }
+};
+
+const uploadStorage = multer.diskStorage({
+  destination: (req, file, callback) => {
+    const uploadDirectories = {
+      gallery: galleryDirectory,
+      achievements: achievementDirectory,
+      projects: projectDirectory,
+      resume: path.join(publicDirectory, 'uploads')
+    };
+    const directory = uploadDirectories[req.params.kind];
+    if (!directory) return callback(new Error('Unsupported upload type.'));
+    fs.mkdirSync(directory, { recursive: true });
+    return callback(null, directory);
+  },
+  filename: (req, file, callback) => {
+    const extension = path.extname(file.originalname).toLowerCase();
+    return callback(null, `${crypto.randomUUID()}${extension}`);
+  }
+});
+const assetUpload = multer({
+  storage: uploadStorage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, callback) => {
+    const extension = path.extname(file.originalname).toLowerCase();
+    const allowed = {
+      gallery: new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']),
+      achievements: new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.pdf']),
+      projects: new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']),
+      resume: new Set(['.pdf'])
+    };
+    if (!allowed[req.params.kind]?.has(extension)) {
+      return callback(new Error('This file type is not allowed for the selected section.'));
+    }
+    return callback(null, true);
+  }
+});
 
 // Uploaded assets must be served outside the compiled build directory too.
 app.use('/api/uploads/gallery', express.static(galleryDirectory));
@@ -581,12 +697,106 @@ app.get('/api/health', (req, res) => {
 
 // Routes
 app.get('/api/portfolio', (req, res) => {
-  const editable = readPortfolioOverrides();
-  res.json({
-    ...portfolioData,
-    ...editable,
-    personal: { ...portfolioData.personal, ...editable.personal },
-    achievements: editable.achievements || portfolioData.achievements
+  try {
+    const editable = readPortfolioOverrides();
+    res.json({
+      ...portfolioData,
+      ...editable,
+      personal: { ...portfolioData.personal, ...editable.personal },
+      achievements: editable.achievements || portfolioData.achievements,
+      projectsManaged: editable.projectsManaged === true
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/admin/session', requireAdmin, (req, res) => {
+  res.json({ success: true, email: req.admin.email });
+});
+
+app.get('/api/admin/portfolio', requireAdmin, (req, res) => {
+  try {
+    const editable = readPortfolioOverrides();
+    res.json({
+      ...portfolioData,
+      ...editable,
+      personal: { ...portfolioData.personal, ...editable.personal },
+      achievements: editable.achievements || portfolioData.achievements,
+      projectsManaged: editable.projectsManaged === true
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.put('/api/admin/portfolio', requireAdmin, (req, res) => {
+  const allowedKeys = new Set([
+    'personal', 'achievements', 'gallery', 'education', 'experience',
+    'projects', 'toolbox', 'testimonials', 'resume'
+  ]);
+  const updates = req.body;
+  if (!updates || typeof updates !== 'object' || Array.isArray(updates)) {
+    return res.status(400).json({ success: false, error: 'A JSON object is required.' });
+  }
+  const unexpectedKeys = Object.keys(updates).filter((key) => !allowedKeys.has(key));
+  if (unexpectedKeys.length > 0) {
+    return res.status(400).json({ success: false, error: `Unsupported content field: ${unexpectedKeys[0]}` });
+  }
+  for (const [key, value] of Object.entries(updates)) {
+    if (key === 'personal') {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        return res.status(400).json({ success: false, error: 'Personal details must be a JSON object.' });
+      }
+    } else if (key !== 'resume' && (!Array.isArray(value) || value.length > 1000
+      || value.some((item) => !item || typeof item !== 'object' || Array.isArray(item)))) {
+      return res.status(400).json({ success: false, error: `${key} must be an array of content objects.` });
+    } else if (key === 'resume' && (typeof value !== 'string' || value.length > 2048)) {
+      return res.status(400).json({ success: false, error: 'Resume must be a valid URL or path.' });
+    }
+  }
+
+  try {
+    const editable = readPortfolioOverrides();
+    const updatedContent = { ...editable, ...updates };
+    if (Object.prototype.hasOwnProperty.call(updates, 'personal')) {
+      updatedContent.personal = { ...editable.personal, ...updates.personal };
+    }
+    if (Object.prototype.hasOwnProperty.call(updates, 'projects')) {
+      updatedContent.projectsManaged = true;
+    }
+    writeJsonFileAtomically(contentFilePath, updatedContent);
+    res.json({
+      success: true,
+      portfolio: {
+        ...portfolioData,
+        ...updatedContent,
+        personal: { ...portfolioData.personal, ...updatedContent.personal },
+        projectsManaged: updatedContent.projectsManaged === true
+      }
+    });
+  } catch (error) {
+    console.error('Failed to save admin portfolio content:', error.message);
+    res.status(500).json({ success: false, error: 'Portfolio content could not be saved.' });
+  }
+});
+
+app.post('/api/admin/uploads/:kind', requireAdmin, (req, res) => {
+  assetUpload.single('file')(req, res, (error) => {
+    if (error) {
+      const status = error instanceof multer.MulterError
+        ? (error.code === 'LIMIT_FILE_SIZE' ? 413 : 400)
+        : 400;
+      return res.status(status).json({ success: false, error: error.message });
+    }
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'Choose a file to upload.' });
+    }
+    const kind = req.params.kind;
+    const relativePath = kind === 'resume'
+      ? `/api/uploads/resume/uploads/${encodeURIComponent(req.file.filename)}`
+      : `/api/uploads/${kind}/${encodeURIComponent(req.file.filename)}`;
+    return res.status(201).json({ success: true, url: relativePath });
   });
 });
 
@@ -674,6 +884,92 @@ const saveMessageToFile = (messageData) => {
     return false;
   }
 };
+
+app.get('/api/admin/messages', requireAdmin, async (req, res) => {
+  try {
+    const unreadOnly = req.query.unread === 'true';
+    if (isMongoDBConnected && mongoose.connection.readyState === 1) {
+      const filter = unreadOnly ? { isRead: false } : {};
+      const messages = await Message.find(filter).sort({ createdAt: -1 }).lean();
+      return res.json({ success: true, messages });
+    }
+
+    const messages = fs.existsSync(messagesFilePath)
+      ? JSON.parse(fs.readFileSync(messagesFilePath, 'utf8'))
+      : [];
+    const visibleMessages = unreadOnly
+      ? messages.filter((message) => !message.isRead)
+      : messages;
+    return res.json({
+      success: true,
+      messages: visibleMessages.sort((left, right) =>
+        new Date(right.createdAt || right.savedAt || 0) - new Date(left.createdAt || left.savedAt || 0))
+    });
+  } catch (error) {
+    console.error('Failed to load admin messages:', error.message);
+    return res.status(500).json({ success: false, error: 'Messages could not be loaded.' });
+  }
+});
+
+app.patch('/api/admin/messages/:id', requireAdmin, async (req, res) => {
+  if (typeof req.body?.isRead !== 'boolean') {
+    return res.status(400).json({ success: false, error: 'isRead must be a boolean.' });
+  }
+  try {
+    if (isMongoDBConnected && mongoose.connection.readyState === 1) {
+      if (!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(400).json({ success: false, error: 'The message ID is invalid.' });
+      }
+      const message = await Message.findByIdAndUpdate(
+        req.params.id,
+        { isRead: req.body.isRead },
+        { new: true, runValidators: true }
+      ).lean();
+      if (!message) return res.status(404).json({ success: false, error: 'Message not found.' });
+      return res.json({ success: true, message });
+    }
+
+    if (!fs.existsSync(messagesFilePath)) {
+      return res.status(404).json({ success: false, error: 'Message not found.' });
+    }
+    const messages = JSON.parse(fs.readFileSync(messagesFilePath, 'utf8'));
+    const message = messages.find((item) => String(item.id) === req.params.id);
+    if (!message) return res.status(404).json({ success: false, error: 'Message not found.' });
+    message.isRead = req.body.isRead;
+    writeJsonFileAtomically(messagesFilePath, messages);
+    return res.json({ success: true, message });
+  } catch (error) {
+    console.error('Failed to update admin message:', error.message);
+    return res.status(500).json({ success: false, error: 'Message could not be updated.' });
+  }
+});
+
+app.delete('/api/admin/messages/:id', requireAdmin, async (req, res) => {
+  try {
+    if (isMongoDBConnected && mongoose.connection.readyState === 1) {
+      if (!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(400).json({ success: false, error: 'The message ID is invalid.' });
+      }
+      const message = await Message.findByIdAndDelete(req.params.id).lean();
+      if (!message) return res.status(404).json({ success: false, error: 'Message not found.' });
+      return res.json({ success: true });
+    }
+
+    if (!fs.existsSync(messagesFilePath)) {
+      return res.status(404).json({ success: false, error: 'Message not found.' });
+    }
+    const messages = JSON.parse(fs.readFileSync(messagesFilePath, 'utf8'));
+    const remainingMessages = messages.filter((item) => String(item.id) !== req.params.id);
+    if (remainingMessages.length === messages.length) {
+      return res.status(404).json({ success: false, error: 'Message not found.' });
+    }
+    writeJsonFileAtomically(messagesFilePath, remainingMessages);
+    return res.json({ success: true });
+  } catch (error) {
+    console.error('Failed to delete admin message:', error.message);
+    return res.status(500).json({ success: false, error: 'Message could not be deleted.' });
+  }
+});
 
 // GitHub Routes
 // GET - Fetch all GitHub projects (with caching)
@@ -832,7 +1128,7 @@ if (fs.existsSync(frontendBuildDirectory)) {
   });
 }
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, async () => {
   console.log(`Server running on http://localhost:${PORT}`);
   
